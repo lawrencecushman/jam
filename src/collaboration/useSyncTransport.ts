@@ -1,5 +1,5 @@
 import * as Y from 'yjs'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRoom } from './RoomProvider'
 import { useTransport } from '../store/useTransport'
 
@@ -12,7 +12,7 @@ export function useSyncTransport() {
   const syncEnabledRef = useRef(syncEnabled)
   syncEnabledRef.current = syncEnabled
 
-  const transportMap = doc.getMap<boolean>('transport')
+  const transportMap = useMemo(() => doc.getMap<boolean>('transport'), [doc])
 
   // React to REMOTE transport changes when sync is enabled
   useEffect(() => {

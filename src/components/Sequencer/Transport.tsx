@@ -63,6 +63,7 @@ export function Transport({
 
       <button
         onClick={onToggleSync}
+        aria-pressed={syncEnabled}
         title={syncEnabled ? 'Sync on — your play/stop is shared with the room' : 'Sync off — your transport is independent'}
         className={[
           'px-3 py-1 rounded text-xs font-mono border transition-colors',
