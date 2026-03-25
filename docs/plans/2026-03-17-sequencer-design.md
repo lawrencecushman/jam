@@ -43,7 +43,7 @@ Yjs awareness protocol (built into y-webrtc). Each client sets local awareness s
 
 - Create a new room (button to generate a fresh room ID and navigate to it)
 - Enter your name (replace random adjective-noun with user-chosen display name)
-- Sync transport (shared play/stop)
+- Sync transport (shared play/stop, opt-in per user via toggle — when enabled, your play/stop follows the room)
 - Sample-based tracks
 - Piano roll
 - Session persistence (y-websocket)
