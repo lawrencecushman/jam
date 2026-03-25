@@ -49,3 +49,5 @@ Yjs awareness protocol (built into y-webrtc). Each client sets local awareness s
 - Session persistence (y-websocket)
 - Track mute/solo/volume
 - Pattern save/load
+- Upgrade to vite-plus (latest release)
+- Get a real domain and deploy
