@@ -87,17 +87,18 @@ export function usePresence() {
     if (!provider) return
     const awareness = provider.awareness
 
-    const onAwarenessChange = () => {
-      const myId = doc.clientID.toString()
-      awareness.getStates().forEach((state: unknown, clientId: number) => {
-        const presenceState = state as UserPresence
-        if (clientId.toString() === myId) return
-        if (!presenceState?.lastEditedStep || !presenceState.color) return
-        const { trackId, stepIndex } = presenceState.lastEditedStep
+    const onAwarenessChange = ({ added, updated }: { added: number[]; updated: number[]; removed: number[] }) => {
+      const myId = doc.clientID
+      const changed = [...added, ...updated].filter((id) => id !== myId)
+
+      changed.forEach((clientId) => {
+        const state = awareness.getStates().get(clientId) as UserPresence | undefined
+        if (!state?.lastEditedStep || !state.color) return
+        const { trackId, stepIndex } = state.lastEditedStep
         const key = `${trackId}:${stepIndex}`
 
         // Flash this cell with the user's color for 500ms
-        setFlashes((prev) => ({ ...prev, [key]: presenceState.color }))
+        setFlashes((prev) => ({ ...prev, [key]: state.color }))
 
         const existing = flashTimers.current.get(key)
         if (existing) clearTimeout(existing)

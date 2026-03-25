@@ -6,6 +6,7 @@ import { useSharedGrid } from '../../collaboration/useSharedState'
 import { usePresence } from '../../collaboration/usePresence'
 import { PresenceBar } from '../PresenceBar'
 import { TrackId } from '../../audio/instruments'
+import { STEP_COUNT } from '../../config'
 
 export function Sequencer() {
   const { grid, toggleStep } = useSharedGrid()
@@ -31,7 +32,7 @@ export function Sequencer() {
     const [trackId, stepStr] = key.split(':')
     const stepIndex = Number(stepStr)
     if (!presenceFlashes[trackId as TrackId]) {
-      presenceFlashes[trackId as TrackId] = Array(16).fill(null)
+      presenceFlashes[trackId as TrackId] = Array(STEP_COUNT).fill(null)
     }
     presenceFlashes[trackId as TrackId]![stepIndex] = color ?? null
   }
