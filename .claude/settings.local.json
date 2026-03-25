@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:viteplus.dev)",
+      "Bash(node --version)",
+      "Bash(npm --version)",
+      "Bash(npm info vite-plus version)",
+      "Bash(npm info create-vite version)",
+      "Bash(npm info yjs version)",
+      "Bash(npm info y-webrtc version)",
+      "Bash(npm info zustand version)",
+      "Bash(npm info nanoid version)",
+      "Bash(npm info @tailwindcss/vite version)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}
