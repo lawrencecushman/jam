@@ -5,6 +5,7 @@ import { useTransport } from '../../store/useTransport'
 import { useSharedGrid } from '../../collaboration/useSharedState'
 import { usePresence } from '../../collaboration/usePresence'
 import { PresenceBar } from '../PresenceBar'
+import { NameInput } from '../NameInput'
 import { TrackId } from '../../audio/instruments'
 import { STEP_COUNT } from '../../config'
 
@@ -48,7 +49,10 @@ export function Sequencer() {
           onStop={stop}
           onBpmChange={setBpm}
         />
-        <PresenceBar users={users} />
+        <div className="flex items-center gap-3">
+          <NameInput />
+          <PresenceBar users={users} />
+        </div>
       </div>
       <Grid
         grid={grid}
