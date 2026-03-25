@@ -46,10 +46,9 @@ export function useSyncTransport() {
 
   // Toggle sync; when enabling, immediately snap to current shared state
   const toggleSync = useCallback(() => {
-    setSyncEnabled((prev) => !prev)
-    // Snap to current shared state when enabling.
-    // Read syncEnabledRef.current (pre-toggle value) so !current = the new value.
     const next = !syncEnabledRef.current
+    setSyncEnabled(next)
+    // Snap to current shared state when enabling sync
     if (next) {
       const sharedIsPlaying = transportMap.get('isPlaying')
       if (sharedIsPlaying === true) play()
