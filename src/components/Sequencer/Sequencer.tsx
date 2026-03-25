@@ -10,7 +10,7 @@ import { TrackId } from '../../audio/instruments'
 import { STEP_COUNT } from '../../config'
 
 export function Sequencer() {
-  const { grid, toggleStep } = useSharedGrid()
+  const { grid, paintStep } = useSharedGrid()
   const gridRef = useRef(grid)
   gridRef.current = grid
 
@@ -20,10 +20,11 @@ export function Sequencer() {
   useEffect(() => {
     initEngine(() => gridRef.current)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, []
+  )
 
-  function handleToggle(trackId: TrackId, stepIndex: number) {
-    toggleStep(trackId, stepIndex)
+  function handlePaint(trackId: TrackId, stepIndex: number, value: boolean) {
+    paintStep(trackId, stepIndex, value)
     notifyEdit(trackId, stepIndex)
   }
 
@@ -58,7 +59,7 @@ export function Sequencer() {
         grid={grid}
         currentStep={currentStep}
         presenceFlashes={presenceFlashes}
-        onToggle={handleToggle}
+        onPaint={handlePaint}
       />
     </div>
   )

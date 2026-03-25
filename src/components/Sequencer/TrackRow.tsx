@@ -5,10 +5,11 @@ interface TrackRowProps {
   steps: boolean[]
   currentStep: number
   presenceColors?: (string | null)[]
-  onToggle: (stepIndex: number) => void
+  onPointerDown: (stepIndex: number) => void
+  onPointerEnter: (stepIndex: number) => void
 }
 
-export function TrackRow({ label, steps, currentStep, presenceColors, onToggle }: TrackRowProps) {
+export function TrackRow({ label, steps, currentStep, presenceColors, onPointerDown, onPointerEnter }: TrackRowProps) {
   return (
     <div className="flex items-center gap-2">
       <span className="w-16 text-right text-xs text-zinc-400 font-mono shrink-0">{label}</span>
@@ -19,7 +20,8 @@ export function TrackRow({ label, steps, currentStep, presenceColors, onToggle }
             active={active}
             isCurrent={currentStep === i}
             presenceColor={presenceColors?.[i] ?? null}
-            onToggle={() => onToggle(i)}
+            onPointerDown={() => onPointerDown(i)}
+            onPointerEnter={() => onPointerEnter(i)}
           />
         ))}
       </div>
