@@ -3,8 +3,7 @@ import * as Y from 'yjs'
 import { WebrtcProvider } from 'y-webrtc'
 import { nanoid } from 'nanoid'
 import { TRACKS } from '../audio/instruments'
-
-const STEP_COUNT = 16
+import { STEP_COUNT } from '../config'
 
 interface RoomContextValue {
   doc: Y.Doc

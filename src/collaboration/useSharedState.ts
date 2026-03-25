@@ -2,8 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import * as Y from 'yjs'
 import { useRoom } from './RoomProvider'
 import { TrackId, TRACKS } from '../audio/instruments'
-
-const STEP_COUNT = 16
+import { STEP_COUNT } from '../config'
 
 type Grid = Record<TrackId, boolean[]>
 
@@ -17,7 +16,7 @@ function yGridToSnapshot(yGrid: Y.Map<Y.Array<boolean>>): Grid {
 }
 
 export function useSharedGrid() {
-  const { grid } = useRoom()
+  const { grid, doc } = useRoom()
   const [snapshot, setSnapshot] = useState<Grid>(() => yGridToSnapshot(grid))
 
   useEffect(() => {
@@ -32,10 +31,12 @@ export function useSharedGrid() {
       const yArr = grid.get(trackId)
       if (!yArr) return
       const current = yArr.get(stepIndex)
-      yArr.delete(stepIndex, 1)
-      yArr.insert(stepIndex, [!current])
+      doc.transact(() => {
+        yArr.delete(stepIndex, 1)
+        yArr.insert(stepIndex, [!current])
+      })
     },
-    [grid]
+    [grid, doc]
   )
 
   return { grid: snapshot, toggleStep }
