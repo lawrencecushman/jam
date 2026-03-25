@@ -36,7 +36,11 @@ function randomName(): string {
 }
 
 function getInitialName(): string {
-  return localStorage.getItem(DISPLAY_NAME_KEY) ?? randomName()
+  const stored = localStorage.getItem(DISPLAY_NAME_KEY)
+  if (stored) return stored
+  const name = randomName()
+  localStorage.setItem(DISPLAY_NAME_KEY, name)
+  return name
 }
 
 export function usePresence() {
