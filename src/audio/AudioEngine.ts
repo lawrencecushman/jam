@@ -13,6 +13,7 @@ export class AudioEngine {
   private nextNoteTime = 0
   private currentStep = 0
   private _bpm = 120
+  private generation = 0
   private getGrid: () => GridSnapshot
   private onStep: (step: number) => void
 
@@ -38,7 +39,7 @@ export class AudioEngine {
     if (this.intervalId !== null) return
 
     // AudioContext must be created/resumed after a user gesture
-    if (!this.ctx) {
+    if (!this.ctx || this.ctx.state === 'closed') {
       this.ctx = new AudioContext()
     } else if (this.ctx.state === 'suspended') {
       this.ctx.resume()
@@ -55,10 +56,12 @@ export class AudioEngine {
       clearInterval(this.intervalId)
       this.intervalId = null
     }
+    this.generation++
   }
 
   private tick() {
     if (!this.ctx) return
+    const gen = this.generation
 
     while (this.nextNoteTime < this.ctx.currentTime + SCHEDULE_AHEAD_TIME) {
       this.scheduleStep(this.currentStep, this.nextNoteTime)
@@ -68,7 +71,9 @@ export class AudioEngine {
 
       // Notify React at the moment the step SHOULD play
       const delay = (this.nextNoteTime - this.stepDuration - this.ctx.currentTime) * 1000
-      setTimeout(() => this.onStep(step), Math.max(0, delay))
+      setTimeout(() => {
+        if (this.generation === gen) this.onStep(step)
+      }, Math.max(0, delay))
     }
   }
 
@@ -77,7 +82,7 @@ export class AudioEngine {
     const grid = this.getGrid()
     for (const [trackIdStr, steps] of Object.entries(grid)) {
       const trackId = trackIdStr as TrackId
-      if (steps[step]) {
+      if (trackId in SYNTH_MAP && steps[step]) {
         SYNTH_MAP[trackId](this.ctx, when)
       }
     }
