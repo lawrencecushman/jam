@@ -4,6 +4,7 @@ import { Transport } from './Transport'
 import { useTransport } from '../../store/useTransport'
 import { useSharedGrid } from '../../collaboration/useSharedState'
 import { usePresence } from '../../collaboration/usePresence'
+import { useSyncTransport } from '../../collaboration/useSyncTransport'
 import { PresenceBar } from '../PresenceBar'
 import { NameInput } from '../NameInput'
 import { TrackId } from '../../audio/instruments'
@@ -14,14 +15,14 @@ export function Sequencer() {
   const gridRef = useRef(grid)
   gridRef.current = grid
 
-  const { isPlaying, currentStep, bpm, initEngine, play, stop, setBpm } = useTransport()
+  const { isPlaying, currentStep, bpm, initEngine, setBpm } = useTransport()
   const { users, flashes, notifyEdit } = usePresence()
+  const { syncEnabled, toggleSync, syncPlay, syncStop } = useSyncTransport()
 
   useEffect(() => {
     initEngine(() => gridRef.current)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []
-  )
+  }, [])
 
   function handlePaint(trackId: TrackId, stepIndex: number, value: boolean) {
     paintStep(trackId, stepIndex, value)
@@ -46,9 +47,11 @@ export function Sequencer() {
           isPlaying={isPlaying}
           bpm={bpm}
           currentStep={currentStep}
-          onPlay={play}
-          onStop={stop}
+          syncEnabled={syncEnabled}
+          onPlay={syncPlay}
+          onStop={syncStop}
           onBpmChange={setBpm}
+          onToggleSync={toggleSync}
         />
         <div className="flex items-center gap-3">
           <NameInput />
