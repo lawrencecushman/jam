@@ -45,9 +45,9 @@ Yjs awareness protocol (built into y-webrtc). Each client sets local awareness s
 - Enter your name (replace random adjective-noun with user-chosen display name)
 - Sync transport (shared play/stop, opt-in per user via toggle — when enabled, your play/stop follows the room)
 - Sample-based tracks
-- Piano roll
 - Session persistence (y-websocket)
-- Track mute/solo/volume
-- Pattern save/load
 - Upgrade to vite-plus (latest release)
 - Get a real domain and deploy
+- Track mute/solo/volume
+- Pattern save/load
+- Piano roll
