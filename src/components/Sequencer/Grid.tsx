@@ -15,7 +15,11 @@ export function Grid({ grid, currentStep, presenceFlashes, onPaint }: GridProps)
   useEffect(() => {
     const endDrag = () => { dragRef.current = null }
     window.addEventListener('pointerup', endDrag)
-    return () => window.removeEventListener('pointerup', endDrag)
+    window.addEventListener('pointercancel', endDrag)
+    return () => {
+      window.removeEventListener('pointerup', endDrag)
+      window.removeEventListener('pointercancel', endDrag)
+    }
   }, [])
 
   function handlePointerDown(trackId: TrackId, stepIndex: number) {

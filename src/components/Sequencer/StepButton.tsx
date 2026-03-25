@@ -11,6 +11,12 @@ export function StepButton({ active, isCurrent, presenceColor, onPointerDown, on
     <button
       onPointerDown={onPointerDown}
       onPointerEnter={onPointerEnter}
+      onKeyDown={(e) => {
+        if (e.key === ' ' || e.key === 'Enter') {
+          e.preventDefault()
+          onPointerDown()
+        }
+      }}
       style={{
         touchAction: 'none',
         ...(presenceColor ? { boxShadow: `0 0 0 2px ${presenceColor}` } : {}),
