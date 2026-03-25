@@ -39,5 +39,18 @@ export function useSharedGrid() {
     [grid, doc]
   )
 
-  return { grid: snapshot, toggleStep }
+  const paintStep = useCallback(
+    (trackId: TrackId, stepIndex: number, value: boolean) => {
+      const yArr = grid.get(trackId)
+      if (!yArr) return
+      if (yArr.get(stepIndex) === value) return // already correct, skip CRDT write
+      doc.transact(() => {
+        yArr.delete(stepIndex, 1)
+        yArr.insert(stepIndex, [value])
+      })
+    },
+    [grid, doc]
+  )
+
+  return { grid: snapshot, toggleStep, paintStep }
 }
