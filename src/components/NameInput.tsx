@@ -7,6 +7,7 @@ export function NameInput() {
   const { users, setDisplayName } = usePresence()
   const [editing, setEditing] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const cancelledRef = useRef(false)
 
   const myUserId = doc.clientID.toString()
   const me = users.find((u) => u.userId === myUserId)
@@ -18,6 +19,10 @@ export function NameInput() {
   }
 
   function commit() {
+    if (cancelledRef.current) {
+      cancelledRef.current = false
+      return
+    }
     const val = inputRef.current?.value ?? ''
     if (val.trim()) setDisplayName(val.trim())
     setEditing(false)
@@ -25,7 +30,10 @@ export function NameInput() {
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter') commit()
-    if (e.key === 'Escape') setEditing(false)
+    if (e.key === 'Escape') {
+      cancelledRef.current = true
+      setEditing(false)
+    }
   }
 
   if (editing) {
