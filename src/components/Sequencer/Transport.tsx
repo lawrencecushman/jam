@@ -23,8 +23,9 @@ export function Transport({ isPlaying, bpm, currentStep, onPlay, onStop, onBpmCh
       </button>
 
       <div className="flex items-center gap-2">
-        <label className="text-xs text-zinc-400 font-mono">BPM</label>
+        <label htmlFor="bpm-input" className="text-xs text-zinc-400 font-mono">BPM</label>
         <input
+          id="bpm-input"
           type="number"
           min={40}
           max={240}

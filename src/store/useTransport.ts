@@ -34,7 +34,7 @@ export const useTransport = create<TransportStore>((set, get) => ({
     const engine = get().engine
     if (!engine) return
     engine.start()
-    set({ isPlaying: true, currentStep: 0 })
+    set({ isPlaying: true })
   },
 
   stop: () => {
