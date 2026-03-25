@@ -21,6 +21,8 @@ const PRESENCE_COLORS = [
   '#ef4444', // red
 ]
 
+const DISPLAY_NAME_KEY = 'musicbench:displayName'
+
 function getColor(index: number): string {
   return PRESENCE_COLORS[index % PRESENCE_COLORS.length]
 }
@@ -33,6 +35,10 @@ function randomName(): string {
   return `${adj} ${noun}`
 }
 
+function getInitialName(): string {
+  return localStorage.getItem(DISPLAY_NAME_KEY) ?? randomName()
+}
+
 export function usePresence() {
   const { provider, doc } = useRoom()
   const [users, setUsers] = useState<UserPresence[]>([])
@@ -40,7 +46,7 @@ export function usePresence() {
   const [flashes, setFlashes] = useState<Partial<Record<string, string>>>({})
   const flashTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map())
 
-  const myName = useRef(randomName())
+  const myName = useRef(getInitialName())
   const myColor = useRef<string | null>(null)
 
   useEffect(() => {
@@ -48,7 +54,6 @@ export function usePresence() {
 
     const awareness = provider.awareness
 
-    // Assign our own presence
     myColor.current = getColor(doc.clientID)
 
     awareness.setLocalState({
@@ -71,6 +76,19 @@ export function usePresence() {
       awareness.setLocalState(null)
     }
   }, [provider, doc])
+
+  const setDisplayName = useCallback(
+    (name: string) => {
+      const trimmed = name.trim()
+      if (!trimmed) return
+      localStorage.setItem(DISPLAY_NAME_KEY, trimmed)
+      myName.current = trimmed
+      if (provider) {
+        provider.awareness.setLocalStateField('displayName', trimmed)
+      }
+    },
+    [provider]
+  )
 
   const notifyEdit = useCallback(
     (trackId: TrackId, stepIndex: number) => {
@@ -95,7 +113,6 @@ export function usePresence() {
         const { trackId, stepIndex } = state.lastEditedStep
         const key = `${trackId}:${stepIndex}`
 
-        // Flash this cell with the user's color for 500ms
         setFlashes((prev) => ({ ...prev, [key]: state.color }))
 
         const existing = flashTimers.current.get(key)
@@ -116,5 +133,5 @@ export function usePresence() {
     return () => awareness.off('change', onAwarenessChange)
   }, [provider, doc])
 
-  return { users, flashes, notifyEdit }
+  return { users, flashes, notifyEdit, setDisplayName }
 }
