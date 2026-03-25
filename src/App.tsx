@@ -1,6 +1,7 @@
 import { Sequencer } from './components/Sequencer/Sequencer'
 import { RoomProvider } from './collaboration/RoomProvider'
 import { ShareButton } from './components/Sequencer/ShareButton'
+import { NewRoomButton } from './components/NewRoomButton'
 
 export default function App() {
   return (
@@ -11,6 +12,7 @@ export default function App() {
             Music Bench
           </h1>
           <ShareButton />
+          <NewRoomButton />
         </div>
         <Sequencer />
       </div>
