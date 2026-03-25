@@ -41,6 +41,8 @@ Yjs awareness protocol (built into y-webrtc). Each client sets local awareness s
 
 ## Backlog
 
+- Create a new room (button to generate a fresh room ID and navigate to it)
+- Enter your name (replace random adjective-noun with user-chosen display name)
 - Sync transport (shared play/stop)
 - Sample-based tracks
 - Piano roll

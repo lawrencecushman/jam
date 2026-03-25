@@ -20,16 +20,16 @@ export function useRoom() {
   return ctx
 }
 
-function getOrCreateRoomId(): string {
+function getOrCreateRoomId(): { roomId: string; isNewRoom: boolean } {
   const params = new URLSearchParams(window.location.search)
   const existing = params.get('room')
-  if (existing) return existing
+  if (existing) return { roomId: existing, isNewRoom: false }
 
   const id = nanoid(8)
   const url = new URL(window.location.href)
   url.searchParams.set('room', id)
   window.history.replaceState(null, '', url.toString())
-  return id
+  return { roomId: id, isNewRoom: true }
 }
 
 function initializeGrid(doc: Y.Doc, grid: Y.Map<Y.Array<boolean>>) {
@@ -45,30 +45,60 @@ function initializeGrid(doc: Y.Doc, grid: Y.Map<Y.Array<boolean>>) {
 }
 
 export function RoomProvider({ children }: { children: React.ReactNode }) {
-  const roomId = useMemo(() => getOrCreateRoomId(), [])
+  const { roomId, isNewRoom } = useMemo(() => getOrCreateRoomId(), [])
   const [provider, setProvider] = useState<WebrtcProvider | null>(null)
 
   const doc = useMemo(() => {
     const d = new Y.Doc()
-    const grid = d.getMap<Y.Array<boolean>>('grid')
-    initializeGrid(d, grid)
+    if (isNewRoom) {
+      // New room — safe to initialize immediately, no peers have data yet
+      initializeGrid(d, d.getMap<Y.Array<boolean>>('grid'))
+    }
     return d
-  }, [])
+  }, [isNewRoom])
 
   const grid = useMemo(() => doc.getMap<Y.Array<boolean>>('grid'), [doc])
 
-  // provider is null on first render (before this effect runs).
-  // usePresence must guard against null before accessing provider.awareness.
   useEffect(() => {
     const p = new WebrtcProvider(roomId, doc, {
-      signaling: ['wss://signaling.yjs.dev'],
+      // Multiple signaling servers for reliability
+      signaling: [
+        'wss://signaling.yjs.dev',
+        'wss://y-webrtc-signaling-eu.herokuapp.com',
+      ],
     })
+
+    if (!isNewRoom) {
+      // Joining an existing room — defer initialization until after peer sync
+      // so we don't overwrite the room creator's data (Y.Map is last-write-wins).
+      // Fallback: if no peers found within 2s, initialize as an empty new room.
+      let done = false
+      const ensureInit = () => {
+        if (done) return
+        done = true
+        if (grid.size === 0) initializeGrid(doc, grid)
+      }
+
+      p.on('synced', ({ synced }: { synced: boolean }) => {
+        if (synced) ensureInit()
+      })
+      const fallback = setTimeout(ensureInit, 2000)
+
+      const origDestroy = p.destroy.bind(p)
+      p.destroy = () => {
+        clearTimeout(fallback)
+        origDestroy()
+      }
+    }
+
+    // provider is null on first render (before this effect runs).
+    // usePresence must guard against null before accessing provider.awareness.
     setProvider(p)
     return () => {
       p.destroy()
       setProvider(null)
     }
-  }, [roomId, doc])
+  }, [roomId, doc, grid, isNewRoom])
 
   return (
     <RoomContext.Provider value={{ doc, provider, grid, roomId }}>
