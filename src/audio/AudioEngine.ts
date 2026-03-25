@@ -1,4 +1,5 @@
 import { SYNTH_MAP, TrackId } from './instruments'
+import { STEP_COUNT } from '../config'
 
 // How far ahead to schedule (seconds)
 const SCHEDULE_AHEAD_TIME = 0.1
@@ -67,7 +68,7 @@ export class AudioEngine {
       this.scheduleStep(this.currentStep, this.nextNoteTime)
       this.nextNoteTime += this.stepDuration
       const step = this.currentStep
-      this.currentStep = (this.currentStep + 1) % 16
+      this.currentStep = (this.currentStep + 1) % STEP_COUNT
 
       // Notify React at the moment the step SHOULD play
       const delay = (this.nextNoteTime - this.stepDuration - this.ctx.currentTime) * 1000

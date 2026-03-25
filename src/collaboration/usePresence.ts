@@ -49,9 +49,7 @@ export function usePresence() {
     const awareness = provider.awareness
 
     // Assign our own presence
-    const existingStates = Array.from(awareness.getStates().values())
-    const colorIndex = existingStates.length
-    myColor.current = getColor(colorIndex)
+    myColor.current = getColor(doc.clientID)
 
     awareness.setLocalState({
       userId: doc.clientID.toString(),

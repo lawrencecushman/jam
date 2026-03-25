@@ -1,3 +1,5 @@
+import { STEP_COUNT } from '../../config'
+
 interface TransportProps {
   isPlaying: boolean
   bpm: number
@@ -37,7 +39,7 @@ export function Transport({ isPlaying, bpm, currentStep, onPlay, onStop, onBpmCh
 
       {/* Step indicator dots */}
       <div className="flex gap-1">
-        {Array.from({ length: 16 }, (_, i) => (
+        {Array.from({ length: STEP_COUNT }, (_, i) => (
           <div
             key={i}
             className={[
