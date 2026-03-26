@@ -84,6 +84,8 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
     wsProvider.on('sync', (synced: boolean) => {
       if (synced) ensureInit()
     })
+    // Handle the case where sync already fired before the listener was registered
+    if (wsProvider.synced) ensureInit()
     const fallback = setTimeout(ensureInit, 3000)
 
     // Expose the WebRTC provider via context — usePresence uses its .awareness

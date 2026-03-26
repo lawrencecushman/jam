@@ -11,6 +11,7 @@
     "server": "HOST=localhost PORT=1234 YPERSISTENCE=./db y-websocket"
   },
   "dependencies": {
+    "@y/websocket-server": "^0.1.5",
     "nanoid": "^5.1.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -25,7 +26,6 @@
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
-    "@y/websocket-server": "^0.1.5",
     "eslint": "^9.21.0",
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.19",
