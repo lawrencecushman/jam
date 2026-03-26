@@ -1,9 +1,14 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import * as Y from 'yjs'
 import { WebrtcProvider } from 'y-webrtc'
+import { WebsocketProvider } from 'y-websocket'
 import { nanoid } from 'nanoid'
 import { TRACKS } from '../audio/instruments'
 import { STEP_COUNT } from '../config'
+
+// In development this defaults to localhost. For production, set VITE_WS_URL
+// in your environment (e.g. VITE_WS_URL=wss://your-server.com npm run build).
+const WS_URL = import.meta.env.VITE_WS_URL ?? 'ws://localhost:1234'
 
 interface RoomContextValue {
   doc: Y.Doc
@@ -20,16 +25,16 @@ export function useRoom() {
   return ctx
 }
 
-function getOrCreateRoomId(): { roomId: string; isNewRoom: boolean } {
+function getOrCreateRoomId(): string {
   const params = new URLSearchParams(window.location.search)
   const existing = params.get('room')
-  if (existing) return { roomId: existing, isNewRoom: false }
+  if (existing) return existing
 
   const id = nanoid(8)
   const url = new URL(window.location.href)
   url.searchParams.set('room', id)
   window.history.replaceState(null, '', url.toString())
-  return { roomId: id, isNewRoom: true }
+  return id
 }
 
 function initializeGrid(doc: Y.Doc, grid: Y.Map<Y.Array<boolean>>) {
@@ -45,60 +50,52 @@ function initializeGrid(doc: Y.Doc, grid: Y.Map<Y.Array<boolean>>) {
 }
 
 export function RoomProvider({ children }: { children: React.ReactNode }) {
-  const { roomId, isNewRoom } = useMemo(() => getOrCreateRoomId(), [])
+  const roomId = useMemo(() => getOrCreateRoomId(), [])
   const [provider, setProvider] = useState<WebrtcProvider | null>(null)
 
-  const doc = useMemo(() => {
-    const d = new Y.Doc()
-    if (isNewRoom) {
-      // New room — safe to initialize immediately, no peers have data yet
-      initializeGrid(d, d.getMap<Y.Array<boolean>>('grid'))
-    }
-    return d
-  }, [isNewRoom])
-
+  const doc = useMemo(() => new Y.Doc(), [])
   const grid = useMemo(() => doc.getMap<Y.Array<boolean>>('grid'), [doc])
 
   useEffect(() => {
-    const p = new WebrtcProvider(roomId, doc, {
-      // Multiple signaling servers for reliability
+    // WebSocket provider: connects to the persistence server.
+    // Its 'sync' event fires once the server has delivered any saved doc state.
+    // If the server is unreachable, the fallback timer handles initialization.
+    const wsProvider = new WebsocketProvider(WS_URL, roomId, doc)
+
+    // WebRTC provider: low-latency P2P sync between browser tabs + awareness (presence).
+    const webrtcProvider = new WebrtcProvider(roomId, doc, {
       signaling: [
         'wss://signaling.yjs.dev',
         'wss://y-webrtc-signaling-eu.herokuapp.com',
       ],
     })
 
-    if (!isNewRoom) {
-      // Joining an existing room — defer initialization until after peer sync
-      // so we don't overwrite the room creator's data (Y.Map is last-write-wins).
-      // Fallback: if no peers found within 2s, initialize as an empty new room.
-      let done = false
-      const ensureInit = () => {
-        if (done) return
-        done = true
-        if (grid.size === 0) initializeGrid(doc, grid)
-      }
-
-      p.on('synced', ({ synced }: { synced: boolean }) => {
-        if (synced) ensureInit()
-      })
-      const fallback = setTimeout(ensureInit, 2000)
-
-      const origDestroy = p.destroy.bind(p)
-      p.destroy = () => {
-        clearTimeout(fallback)
-        origDestroy()
-      }
+    // Initialize grid tracks once the server has delivered any persisted state.
+    // initializeGrid is idempotent — it only adds tracks that don't exist yet.
+    // Fallback: if WS doesn't sync within 3s (server down or first-ever visit),
+    // initialize anyway so the UI is never stuck waiting.
+    let done = false
+    const ensureInit = () => {
+      if (done) return
+      done = true
+      initializeGrid(doc, grid)
     }
 
-    // provider is null on first render (before this effect runs).
-    // usePresence must guard against null before accessing provider.awareness.
-    setProvider(p)
+    wsProvider.on('sync', (synced: boolean) => {
+      if (synced) ensureInit()
+    })
+    const fallback = setTimeout(ensureInit, 3000)
+
+    // Expose the WebRTC provider via context — usePresence uses its .awareness
+    setProvider(webrtcProvider)
+
     return () => {
-      p.destroy()
+      clearTimeout(fallback)
+      wsProvider.destroy()
+      webrtcProvider.destroy()
       setProvider(null)
     }
-  }, [roomId, doc, grid, isNewRoom])
+  }, [roomId, doc, grid])
 
   return (
     <RoomContext.Provider value={{ doc, provider, grid, roomId }}>
