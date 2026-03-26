@@ -2,6 +2,8 @@ import { defineConfig } from "vite-plus";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
+import { cloudflare } from "@cloudflare/vite-plugin";
+
 export default defineConfig({
   staged: {
     "*": "vp check --fix",
@@ -14,7 +16,7 @@ export default defineConfig({
       typeCheck: true,
     },
   },
-  plugins: [tailwindcss(), react()],
+  plugins: [tailwindcss(), react(), cloudflare()],
   server: {
     host: true,
     allowedHosts: true,
