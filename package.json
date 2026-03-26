@@ -7,10 +7,11 @@
     "dev": "vp dev",
     "build": "tsc -b && vp build",
     "lint": "vp lint .",
-    "preview": "vp preview",
+    "preview": "npm run build && wrangler dev",
     "server": "HOST=localhost PORT=1234 YPERSISTENCE=./db node node_modules/y-websocket/bin/server.js",
     "signaling": "PORT=4444 node node_modules/y-webrtc/bin/server.js",
-    "prepare": "vp config"
+    "prepare": "vp config",
+    "deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {
     "nanoid": "^5.1.7",
@@ -22,6 +23,7 @@
     "zustand": "^5.0.12"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.30.1",
     "@tailwindcss/vite": "^4.2.2",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
@@ -30,7 +32,8 @@
     "typescript": "~5.7.2",
     "vite": "npm:@voidzero-dev/vite-plus-core@latest",
     "vite-plus": "latest",
-    "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
+    "vitest": "npm:@voidzero-dev/vite-plus-test@latest",
+    "wrangler": "^4.77.0"
   },
   "overrides": {
     "vite": "npm:@voidzero-dev/vite-plus-core@latest",
