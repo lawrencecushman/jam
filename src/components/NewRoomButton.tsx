@@ -1,8 +1,8 @@
-import { nanoid } from 'nanoid'
+import { nanoid } from "nanoid";
 
 export function NewRoomButton() {
   function handleClick() {
-    window.location.href = window.location.origin + '?room=' + nanoid(8)
+    window.location.href = window.location.origin + "?room=" + nanoid(8);
   }
 
   return (
@@ -12,5 +12,5 @@ export function NewRoomButton() {
     >
       New Room
     </button>
-  )
+  );
 }

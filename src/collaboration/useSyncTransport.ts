@@ -1,60 +1,60 @@
-import * as Y from 'yjs'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useRoom } from './RoomProvider'
-import { useTransport } from '../store/useTransport'
+import * as Y from "yjs";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useRoom } from "./RoomProvider";
+import { useTransport } from "../store/useTransport";
 
 export function useSyncTransport() {
-  const { doc } = useRoom()
-  const { play, stop } = useTransport()
-  const [syncEnabled, setSyncEnabled] = useState(false)
+  const { doc } = useRoom();
+  const { play, stop } = useTransport();
+  const [syncEnabled, setSyncEnabled] = useState(false);
 
   // Stable ref so the observer closure never captures a stale value
-  const syncEnabledRef = useRef(syncEnabled)
-  syncEnabledRef.current = syncEnabled
+  const syncEnabledRef = useRef(syncEnabled);
+  syncEnabledRef.current = syncEnabled;
 
-  const transportMap = useMemo(() => doc.getMap<boolean>('transport'), [doc])
+  const transportMap = useMemo(() => doc.getMap<boolean>("transport"), [doc]);
 
   // React to REMOTE transport changes when sync is enabled
   useEffect(() => {
     const observer = (event: Y.YMapEvent<boolean>) => {
-      if (event.transaction.local) return // our own write, already applied locally
-      if (!syncEnabledRef.current) return
-      const sharedIsPlaying = transportMap.get('isPlaying')
-      if (sharedIsPlaying === true) play()
-      else if (sharedIsPlaying === false) stop()
-    }
+      if (event.transaction.local) return; // our own write, already applied locally
+      if (!syncEnabledRef.current) return;
+      const sharedIsPlaying = transportMap.get("isPlaying");
+      if (sharedIsPlaying === true) play();
+      else if (sharedIsPlaying === false) stop();
+    };
 
-    transportMap.observe(observer)
-    return () => transportMap.unobserve(observer)
-  }, [transportMap, play, stop])
+    transportMap.observe(observer);
+    return () => transportMap.unobserve(observer);
+  }, [transportMap, play, stop]);
 
   // Sync-aware play: broadcast + start local engine
   const syncPlay = useCallback(() => {
     if (syncEnabled) {
-      transportMap.set('isPlaying', true)
+      transportMap.set("isPlaying", true);
     }
-    play()
-  }, [syncEnabled, transportMap, play])
+    play();
+  }, [syncEnabled, transportMap, play]);
 
   // Sync-aware stop: broadcast + stop local engine
   const syncStop = useCallback(() => {
     if (syncEnabled) {
-      transportMap.set('isPlaying', false)
+      transportMap.set("isPlaying", false);
     }
-    stop()
-  }, [syncEnabled, transportMap, stop])
+    stop();
+  }, [syncEnabled, transportMap, stop]);
 
   // Toggle sync; when enabling, immediately snap to current shared state
   const toggleSync = useCallback(() => {
-    const next = !syncEnabledRef.current
-    setSyncEnabled(next)
+    const next = !syncEnabledRef.current;
+    setSyncEnabled(next);
     // Snap to current shared state when enabling sync
     if (next) {
-      const sharedIsPlaying = transportMap.get('isPlaying')
-      if (sharedIsPlaying === true) play()
-      else if (sharedIsPlaying === false) stop()
+      const sharedIsPlaying = transportMap.get("isPlaying");
+      if (sharedIsPlaying === true) play();
+      else if (sharedIsPlaying === false) stop();
     }
-  }, [transportMap, play, stop])
+  }, [transportMap, play, stop]);
 
-  return { syncEnabled, toggleSync, syncPlay, syncStop }
+  return { syncEnabled, toggleSync, syncPlay, syncStop };
 }

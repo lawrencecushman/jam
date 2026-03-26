@@ -1,43 +1,43 @@
-import { useEffect, useRef } from 'react'
-import { Grid } from './Grid'
-import { Transport } from './Transport'
-import { useTransport } from '../../store/useTransport'
-import { useSharedGrid } from '../../collaboration/useSharedState'
-import { usePresence } from '../../collaboration/usePresence'
-import { useSyncTransport } from '../../collaboration/useSyncTransport'
-import { PresenceBar } from '../PresenceBar'
-import { NameInput } from '../NameInput'
-import { TrackId } from '../../audio/instruments'
-import { STEP_COUNT } from '../../config'
+import { useEffect, useRef } from "react";
+import { Grid } from "./Grid";
+import { Transport } from "./Transport";
+import { useTransport } from "../../store/useTransport";
+import { useSharedGrid } from "../../collaboration/useSharedState";
+import { usePresence } from "../../collaboration/usePresence";
+import { useSyncTransport } from "../../collaboration/useSyncTransport";
+import { PresenceBar } from "../PresenceBar";
+import { NameInput } from "../NameInput";
+import { TrackId } from "../../audio/instruments";
+import { STEP_COUNT } from "../../config";
 
 export function Sequencer() {
-  const { grid, paintStep } = useSharedGrid()
-  const gridRef = useRef(grid)
-  gridRef.current = grid
+  const { grid, paintStep } = useSharedGrid();
+  const gridRef = useRef(grid);
+  gridRef.current = grid;
 
-  const { isPlaying, currentStep, bpm, initEngine, setBpm } = useTransport()
-  const { users, flashes, notifyEdit } = usePresence()
-  const { syncEnabled, toggleSync, syncPlay, syncStop } = useSyncTransport()
+  const { isPlaying, currentStep, bpm, initEngine, setBpm } = useTransport();
+  const { users, flashes, notifyEdit } = usePresence();
+  const { syncEnabled, toggleSync, syncPlay, syncStop } = useSyncTransport();
 
   useEffect(() => {
-    initEngine(() => gridRef.current)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    initEngine(() => gridRef.current);
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function handlePaint(trackId: TrackId, stepIndex: number, value: boolean) {
-    paintStep(trackId, stepIndex, value)
-    notifyEdit(trackId, stepIndex)
+    paintStep(trackId, stepIndex, value);
+    notifyEdit(trackId, stepIndex);
   }
 
   // Convert flat flash map to per-track presence color arrays for Grid
-  const presenceFlashes: Partial<Record<TrackId, (string | null)[]>> = {}
+  const presenceFlashes: Partial<Record<TrackId, (string | null)[]>> = {};
   for (const [key, color] of Object.entries(flashes)) {
-    const [trackId, stepStr] = key.split(':')
-    const stepIndex = Number(stepStr)
+    const [trackId, stepStr] = key.split(":");
+    const stepIndex = Number(stepStr);
     if (!presenceFlashes[trackId as TrackId]) {
-      presenceFlashes[trackId as TrackId] = Array(STEP_COUNT).fill(null)
+      presenceFlashes[trackId as TrackId] = Array(STEP_COUNT).fill(null);
     }
-    presenceFlashes[trackId as TrackId]![stepIndex] = color ?? null
+    presenceFlashes[trackId as TrackId]![stepIndex] = color ?? null;
   }
 
   return (
@@ -65,5 +65,5 @@ export function Sequencer() {
         onPaint={handlePaint}
       />
     </div>
-  )
+  );
 }

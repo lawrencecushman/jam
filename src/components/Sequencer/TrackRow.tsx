@@ -1,15 +1,22 @@
-import { StepButton } from './StepButton'
+import { StepButton } from "./StepButton";
 
 interface TrackRowProps {
-  label: string
-  steps: boolean[]
-  currentStep: number
-  presenceColors?: (string | null)[]
-  onPointerDown: (stepIndex: number) => void
-  onPointerEnter: (stepIndex: number) => void
+  label: string;
+  steps: boolean[];
+  currentStep: number;
+  presenceColors?: (string | null)[];
+  onPointerDown: (stepIndex: number) => void;
+  onPointerEnter: (stepIndex: number) => void;
 }
 
-export function TrackRow({ label, steps, currentStep, presenceColors, onPointerDown, onPointerEnter }: TrackRowProps) {
+export function TrackRow({
+  label,
+  steps,
+  currentStep,
+  presenceColors,
+  onPointerDown,
+  onPointerEnter,
+}: TrackRowProps) {
   return (
     <div className="flex items-center gap-2">
       <span className="w-16 text-right text-xs text-zinc-400 font-mono shrink-0">{label}</span>
@@ -26,5 +33,5 @@ export function TrackRow({ label, steps, currentStep, presenceColors, onPointerD
         ))}
       </div>
     </div>
-  )
+  );
 }

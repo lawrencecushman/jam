@@ -1,14 +1,14 @@
-import { STEP_COUNT } from '../../config'
+import { STEP_COUNT } from "../../config";
 
 interface TransportProps {
-  isPlaying: boolean
-  bpm: number
-  currentStep: number
-  syncEnabled: boolean
-  onPlay: () => void
-  onStop: () => void
-  onBpmChange: (bpm: number) => void
-  onToggleSync: () => void
+  isPlaying: boolean;
+  bpm: number;
+  currentStep: number;
+  syncEnabled: boolean;
+  onPlay: () => void;
+  onStop: () => void;
+  onBpmChange: (bpm: number) => void;
+  onToggleSync: () => void;
 }
 
 export function Transport({
@@ -26,17 +26,19 @@ export function Transport({
       <button
         onClick={isPlaying ? onStop : onPlay}
         className={[
-          'px-5 py-2 rounded font-mono text-sm font-semibold transition-colors',
+          "px-5 py-2 rounded font-mono text-sm font-semibold transition-colors",
           isPlaying
-            ? 'bg-red-500 hover:bg-red-400 text-white'
-            : 'bg-emerald-500 hover:bg-emerald-400 text-black',
-        ].join(' ')}
+            ? "bg-red-500 hover:bg-red-400 text-white"
+            : "bg-emerald-500 hover:bg-emerald-400 text-black",
+        ].join(" ")}
       >
-        {isPlaying ? '■ Stop' : '▶ Play'}
+        {isPlaying ? "■ Stop" : "▶ Play"}
       </button>
 
       <div className="flex items-center gap-2">
-        <label htmlFor="bpm-input" className="text-xs text-zinc-400 font-mono">BPM</label>
+        <label htmlFor="bpm-input" className="text-xs text-zinc-400 font-mono">
+          BPM
+        </label>
         <input
           id="bpm-input"
           type="number"
@@ -54,9 +56,9 @@ export function Transport({
           <div
             key={i}
             className={[
-              'w-2 h-2 rounded-full transition-colors duration-75',
-              i === currentStep ? 'bg-emerald-400' : 'bg-zinc-700',
-            ].join(' ')}
+              "w-2 h-2 rounded-full transition-colors duration-75",
+              i === currentStep ? "bg-emerald-400" : "bg-zinc-700",
+            ].join(" ")}
           />
         ))}
       </div>
@@ -64,16 +66,20 @@ export function Transport({
       <button
         onClick={onToggleSync}
         aria-pressed={syncEnabled}
-        title={syncEnabled ? 'Sync on — your play/stop is shared with the room' : 'Sync off — your transport is independent'}
-        className={[
-          'px-3 py-1 rounded text-xs font-mono border transition-colors',
+        title={
           syncEnabled
-            ? 'border-blue-600 text-blue-400 bg-blue-950'
-            : 'border-zinc-700 text-zinc-500 hover:text-zinc-300 hover:border-zinc-500',
-        ].join(' ')}
+            ? "Sync on — your play/stop is shared with the room"
+            : "Sync off — your transport is independent"
+        }
+        className={[
+          "px-3 py-1 rounded text-xs font-mono border transition-colors",
+          syncEnabled
+            ? "border-blue-600 text-blue-400 bg-blue-950"
+            : "border-zinc-700 text-zinc-500 hover:text-zinc-300 hover:border-zinc-500",
+        ].join(" ")}
       >
-        {syncEnabled ? '⟳ Sync On' : '⟳ Sync Off'}
+        {syncEnabled ? "⟳ Sync On" : "⟳ Sync Off"}
       </button>
     </div>
-  )
+  );
 }

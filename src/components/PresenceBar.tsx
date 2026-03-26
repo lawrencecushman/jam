@@ -1,11 +1,11 @@
-import type { UserPresence } from '../collaboration/usePresence'
+import type { UserPresence } from "../collaboration/usePresence";
 
 interface PresenceBarProps {
-  users: UserPresence[]
+  users: UserPresence[];
 }
 
 export function PresenceBar({ users }: PresenceBarProps) {
-  if (users.length === 0) return null
+  if (users.length === 0) return null;
 
   return (
     <div className="flex items-center gap-2">
@@ -23,5 +23,5 @@ export function PresenceBar({ users }: PresenceBarProps) {
         ))}
       </div>
     </div>
-  )
+  );
 }
