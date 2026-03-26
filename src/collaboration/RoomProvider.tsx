@@ -81,11 +81,19 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
       initializeGrid(doc, grid)
     }
 
+    // WebSocket sync: fires when the server delivers persisted state
     wsProvider.on('sync', (synced: boolean) => {
       if (synced) ensureInit()
     })
-    // Handle the case where sync already fired before the listener was registered
     if (wsProvider.synced) ensureInit()
+
+    // WebRTC sync: fires when a peer delivers state (works without the WS server,
+    // e.g. remote users accessing via ngrok who can't reach ws://localhost:1234)
+    webrtcProvider.on('synced', ({ synced }: { synced: boolean }) => {
+      if (synced) ensureInit()
+    })
+
+    // Last-resort fallback: if neither provider syncs within 3s, initialize anyway
     const fallback = setTimeout(ensureInit, 3000)
 
     // Expose the WebRTC provider via context — usePresence uses its .awareness
