@@ -57,16 +57,21 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
   const grid = useMemo(() => doc.getMap<Y.Array<boolean>>('grid'), [doc])
 
   useEffect(() => {
+    // Skip WebSocket if page is HTTPS but WS_URL is plain ws:// — the browser will
+    // block the connection as mixed content (e.g. app loaded via ngrok over https
+    // but the local persistence server is on ws://localhost:1234).
+    const wsAvailable = !(window.location.protocol === 'https:' && WS_URL.startsWith('ws://'))
+
     // WebSocket provider: connects to the persistence server.
     // Its 'sync' event fires once the server has delivered any saved doc state.
-    // If the server is unreachable, the fallback timer handles initialization.
-    const wsProvider = new WebsocketProvider(WS_URL, roomId, doc)
+    // If the server is unreachable or skipped, the fallback timer handles initialization.
+    const wsProvider = wsAvailable ? new WebsocketProvider(WS_URL, roomId, doc) : null
 
     // WebRTC provider: low-latency P2P sync between browser tabs + awareness (presence).
     const webrtcProvider = new WebrtcProvider(roomId, doc, {
       signaling: [
+        'wss://5496-97-126-173-226.ngrok-free.app',
         'wss://signaling.yjs.dev',
-        'wss://y-webrtc-signaling-eu.herokuapp.com',
       ],
     })
 
@@ -82,10 +87,10 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
     }
 
     // WebSocket sync: fires when the server delivers persisted state
-    wsProvider.on('sync', (synced: boolean) => {
+    wsProvider?.on('sync', (synced: boolean) => {
       if (synced) ensureInit()
     })
-    if (wsProvider.synced) ensureInit()
+    if (wsProvider?.synced) ensureInit()
 
     // WebRTC sync: fires when a peer delivers state (works without the WS server,
     // e.g. remote users accessing via ngrok who can't reach ws://localhost:1234)
@@ -101,7 +106,7 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
 
     return () => {
       clearTimeout(fallback)
-      wsProvider.destroy()
+      wsProvider?.destroy()
       webrtcProvider.destroy()
       setProvider(null)
     }
