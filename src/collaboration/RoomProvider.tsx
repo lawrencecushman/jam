@@ -2,7 +2,6 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import * as Y from "yjs";
 import { WebrtcProvider } from "y-webrtc";
 import { WebsocketProvider } from "y-websocket";
-import { nanoid } from "nanoid";
 import { TRACKS } from "../audio/instruments";
 import { STEP_COUNT } from "../config";
 
@@ -26,14 +25,8 @@ export function useRoom() {
 }
 
 function getOrCreateRoomId(): string {
-  const params = new URLSearchParams(window.location.search);
-  const existing = params.get("room");
-  if (existing) return existing;
-
-  const id = nanoid(8);
-  const url = new URL(window.location.href);
-  url.searchParams.set("room", id);
-  window.history.replaceState(null, "", url.toString());
+  const id = new URLSearchParams(window.location.search).get("room");
+  if (!id) throw new Error("RoomProvider rendered without a ?room= param");
   return id;
 }
 
