@@ -28,8 +28,60 @@ function getColor(index: number): string {
 }
 
 function randomName(): string {
-  const adjectives = ["Jazz", "Funky", "Groovy", "Mellow", "Smooth"];
-  const nouns = ["Cat", "Fox", "Bear", "Owl", "Wolf"];
+  const adjectives = [
+    "Jazz",
+    "Funky",
+    "Groovy",
+    "Mellow",
+    "Smooth",
+    "Soulful",
+    "Crispy",
+    "Punchy",
+    "Wobbly",
+    "Dusty",
+    "Silky",
+    "Deep",
+    "Sharp",
+    "Heavy",
+    "Bright",
+    "Dark",
+    "Sweet",
+    "Wild",
+    "Dizzy",
+    "Cosmic",
+    "Fuzzy",
+    "Bouncy",
+    "Slick",
+    "Raw",
+    "Dreamy",
+  ];
+  const nouns = [
+    "Cat",
+    "Fox",
+    "Bear",
+    "Owl",
+    "Wolf",
+    "Hawk",
+    "Vibe",
+    "Beat",
+    "Riff",
+    "Chord",
+    "Synth",
+    "Bass",
+    "Drum",
+    "Loop",
+    "Note",
+    "Pulse",
+    "Groove",
+    "Wave",
+    "Echo",
+    "Tone",
+    "Bard",
+    "Monk",
+    "Coda",
+    "Clef",
+    "Fret",
+  ];
   const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
   const noun = nouns[Math.floor(Math.random() * nouns.length)];
   return `${adj} ${noun}`;
