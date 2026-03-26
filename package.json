@@ -7,13 +7,16 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "server": "HOST=localhost PORT=1234 YPERSISTENCE=./db npx y-websocket"
   },
   "dependencies": {
+    "@y/websocket-server": "^0.1.5",
     "nanoid": "^5.1.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "y-webrtc": "^10.3.0",
+    "y-websocket": "^3.0.0",
     "yjs": "^13.6.30",
     "zustand": "^5.0.12"
   },
