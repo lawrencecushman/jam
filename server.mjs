@@ -10,9 +10,17 @@
 import { createServer } from "http";
 import { WebSocketServer } from "ws";
 import { createRequire } from "module";
+import { fileURLToPath } from "url";
+import { join, dirname } from "path";
 
+// Use an absolute path to bypass the package exports map check —
+// y-websocket/bin/utils.js is not listed in its exports field.
 const require = createRequire(import.meta.url);
-const { setupWSConnection } = require("y-websocket/bin/utils.js");
+const utilsPath = join(
+  dirname(fileURLToPath(import.meta.url)),
+  "node_modules/y-websocket/bin/utils.js",
+);
+const { setupWSConnection } = require(utilsPath);
 
 const PORT = process.env.PORT || 8080;
 const YPERSISTENCE = process.env.YPERSISTENCE;
