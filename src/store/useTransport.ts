@@ -6,6 +6,8 @@ interface TransportStore {
   currentStep: number;
   bpm: number;
   engine: AudioEngine | null;
+  syncEnabled: boolean;
+  setSyncEnabled: (enabled: boolean) => void;
   initEngine: (getGrid: () => GridSnapshot) => void;
   play: () => void;
   stop: () => void;
@@ -18,6 +20,8 @@ export const useTransport = create<TransportStore>((set, get) => ({
   currentStep: -1,
   bpm: 120,
   engine: null,
+  syncEnabled: false,
+  setSyncEnabled: (enabled) => set({ syncEnabled: enabled }),
 
   initEngine: (getGrid) => {
     const existing = get().engine;
