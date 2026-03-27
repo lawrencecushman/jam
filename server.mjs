@@ -23,15 +23,8 @@ const utilsPath = join(
 const { setupWSConnection } = require(utilsPath);
 
 const PORT = process.env.PORT || 8080;
-const YPERSISTENCE = process.env.YPERSISTENCE;
-
-// LevelDB persistence for y-websocket.
-// The Dockerfile CMD deletes any stale LOCK file before starting Node.
-let persistence = null;
-if (YPERSISTENCE) {
-  const { LeveldbPersistence } = require("y-leveldb");
-  persistence = new LeveldbPersistence(YPERSISTENCE);
-}
+// y-websocket/bin/utils.js reads YPERSISTENCE itself and opens LevelDB
+// internally when the module is required. No need to open it again here.
 
 // ─── y-webrtc signaling ───────────────────────────────────────────────────────
 
@@ -136,7 +129,7 @@ const server = createServer((_, res) => {
 });
 
 const wsWss = new WebSocketServer({ noServer: true });
-wsWss.on("connection", (conn, req) => setupWSConnection(conn, req, { persistence }));
+wsWss.on("connection", setupWSConnection);
 
 const signalingWss = new WebSocketServer({ noServer: true });
 signalingWss.on("connection", onSignalingConnection);
@@ -154,5 +147,5 @@ server.listen(PORT, "0.0.0.0", () => {
   console.log(`Combined server on :${PORT}`);
   console.log(`  y-websocket  → wss://<host>/`);
   console.log(`  signaling    → wss://<host>/signaling`);
-  if (YPERSISTENCE) console.log(`  LevelDB      → ${YPERSISTENCE}`);
+  if (process.env.YPERSISTENCE) console.log(`  LevelDB      → ${process.env.YPERSISTENCE}`);
 });
