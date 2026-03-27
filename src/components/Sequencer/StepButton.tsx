@@ -21,9 +21,10 @@ const DISABLE_KEYFRAMES: Keyframe[] = [
   { transform: "scale(1)", opacity: "1" },
 ];
 
-// No boxShadow in hit keyframes — the ring indicator is also box-shadow-based
-// and would be overridden during the animation.
-const HIT_KEYFRAMES: Keyframe[] = [{ transform: "scale(1.2)" }, { transform: "scale(1)" }];
+const HIT_KEYFRAMES: Keyframe[] = [
+  { transform: "scale(1.2)", boxShadow: "0 0 18px 6px rgb(52 211 153 / 0.75)" },
+  { transform: "scale(1)", boxShadow: "0 0 0 0 rgb(52 211 153 / 0)" },
+];
 
 function play(el: HTMLElement, keyframes: Keyframe[], duration: number) {
   el.getAnimations().forEach((a) => a.cancel());
@@ -79,16 +80,15 @@ export function StepButton({
       }}
       className={[
         "w-8 h-8 rounded-sm border transition-colors duration-75 cursor-pointer select-none",
-        active
-          ? "bg-emerald-400 border-emerald-300"
-          : isBeat
-            ? "bg-zinc-800 border-zinc-600 hover:bg-zinc-700"
-            : "bg-zinc-800 border-zinc-700 hover:bg-zinc-700",
-        isCurrent && active
-          ? "ring-2 ring-white ring-offset-1 ring-offset-zinc-950"
-          : isCurrent
-            ? "ring-2 ring-zinc-400 ring-offset-1 ring-offset-zinc-950"
-            : "",
+        active && isCurrent
+          ? "bg-emerald-300 border-emerald-200"
+          : active
+            ? "bg-emerald-400 border-emerald-300"
+            : isCurrent
+              ? "bg-zinc-600 border-zinc-500"
+              : isBeat
+                ? "bg-zinc-800 border-zinc-600 hover:bg-zinc-700"
+                : "bg-zinc-800 border-zinc-700 hover:bg-zinc-700",
       ].join(" ")}
       aria-pressed={active}
     />
