@@ -3,6 +3,8 @@ interface StepButtonProps {
   isCurrent: boolean;
   isBeat: boolean;
   presenceColor?: string | null;
+  trackId: string;
+  stepIndex: number;
   onPointerDown: () => void;
   onPointerEnter: () => void;
 }
@@ -12,11 +14,15 @@ export function StepButton({
   isCurrent,
   isBeat,
   presenceColor,
+  trackId,
+  stepIndex,
   onPointerDown,
   onPointerEnter,
 }: StepButtonProps) {
   return (
     <button
+      data-track={trackId}
+      data-step={stepIndex}
       onPointerDown={onPointerDown}
       onPointerEnter={onPointerEnter}
       onKeyDown={(e) => {
