@@ -12,6 +12,7 @@ import { WebSocketServer } from "ws";
 import { createRequire } from "module";
 import { fileURLToPath } from "url";
 import { join, dirname } from "path";
+import { rmSync } from "fs";
 
 // Use an absolute path to bypass the package exports map check —
 // y-websocket/bin/utils.js is not listed in its exports field.
@@ -25,9 +26,15 @@ const { setupWSConnection } = require(utilsPath);
 const PORT = process.env.PORT || 8080;
 const YPERSISTENCE = process.env.YPERSISTENCE;
 
-// LevelDB persistence for y-websocket
+// LevelDB persistence for y-websocket.
+// Delete any stale LOCK file left by a previous crash before opening.
 let persistence = null;
 if (YPERSISTENCE) {
+  try {
+    rmSync(join(YPERSISTENCE, "LOCK"));
+  } catch {
+    // No lock file — that's fine.
+  }
   const { LeveldbPersistence } = require("y-leveldb");
   persistence = new LeveldbPersistence(YPERSISTENCE);
 }
