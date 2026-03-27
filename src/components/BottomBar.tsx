@@ -18,7 +18,7 @@ function Avatar({ color, name }: { color: string; name: string }) {
 }
 
 export function BottomBar() {
-  const { doc } = useRoom();
+  const { doc, connected } = useRoom();
   const { users } = usePresence();
   const { syncEnabled, toggleSync } = useSyncTransport();
 
@@ -28,10 +28,17 @@ export function BottomBar() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 border-t border-zinc-800 bg-zinc-950 px-3 sm:px-6 py-3 flex items-center gap-2">
-      {/* Left: own avatar + editable name */}
+      {/* Left: own avatar + editable name + connection dot */}
       <div className="flex items-center gap-2 flex-1 min-w-0">
         {me && <Avatar color={me.color} name={me.displayName} />}
         <NameInput />
+        <span
+          title={connected ? "Connected" : "Idle — move to reconnect"}
+          className={[
+            "w-1.5 h-1.5 rounded-full shrink-0 transition-colors duration-500",
+            connected ? "bg-emerald-400" : "bg-zinc-600",
+          ].join(" ")}
+        />
       </div>
 
       {/* Middle: room buttons */}

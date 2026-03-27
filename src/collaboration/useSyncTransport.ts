@@ -1,12 +1,11 @@
 import * as Y from "yjs";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useRoom } from "./RoomProvider";
 import { useTransport } from "../store/useTransport";
 
 export function useSyncTransport() {
   const { doc } = useRoom();
-  const { play, stop } = useTransport();
-  const [syncEnabled, setSyncEnabled] = useState(false);
+  const { play, stop, syncEnabled, setSyncEnabled } = useTransport();
 
   // Stable ref so the observer closure never captures a stale value
   const syncEnabledRef = useRef(syncEnabled);
@@ -54,7 +53,7 @@ export function useSyncTransport() {
       if (sharedIsPlaying === true) play();
       else if (sharedIsPlaying === false) stop();
     }
-  }, [transportMap, play, stop]);
+  }, [transportMap, play, stop, setSyncEnabled]);
 
   return { syncEnabled, toggleSync, syncPlay, syncStop };
 }
