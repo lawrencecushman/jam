@@ -5,8 +5,6 @@ import { useTransport } from "../../store/useTransport";
 import { useSharedGrid } from "../../collaboration/useSharedState";
 import { usePresence } from "../../collaboration/usePresence";
 import { useSyncTransport } from "../../collaboration/useSyncTransport";
-import { PresenceBar } from "../PresenceBar";
-import { NameInput } from "../NameInput";
 import { TrackId } from "../../audio/instruments";
 import { STEP_COUNT } from "../../config";
 
@@ -16,8 +14,8 @@ export function Sequencer() {
   gridRef.current = grid;
 
   const { isPlaying, currentStep, bpm, initEngine, setBpm } = useTransport();
-  const { users, flashes, notifyEdit } = usePresence();
-  const { syncEnabled, toggleSync, syncPlay, syncStop } = useSyncTransport();
+  const { flashes, notifyEdit } = usePresence();
+  const { syncPlay, syncStop } = useSyncTransport();
 
   useEffect(() => {
     initEngine(() => gridRef.current);
@@ -41,23 +39,15 @@ export function Sequencer() {
   }
 
   return (
-    <div className="flex flex-col gap-6 p-6 bg-zinc-900 rounded-xl border border-zinc-800 shadow-2xl">
-      <div className="flex items-center justify-between">
-        <Transport
-          isPlaying={isPlaying}
-          bpm={bpm}
-          currentStep={currentStep}
-          syncEnabled={syncEnabled}
-          onPlay={syncPlay}
-          onStop={syncStop}
-          onBpmChange={setBpm}
-          onToggleSync={toggleSync}
-        />
-        <div className="flex items-center gap-3">
-          <NameInput />
-          <PresenceBar users={users} />
-        </div>
-      </div>
+    <div className="flex flex-col gap-4 sm:gap-6 p-3 sm:p-6 bg-zinc-900 rounded-xl border border-zinc-800 shadow-2xl">
+      <Transport
+        isPlaying={isPlaying}
+        bpm={bpm}
+        currentStep={currentStep}
+        onPlay={syncPlay}
+        onStop={syncStop}
+        onBpmChange={setBpm}
+      />
       <Grid
         grid={grid}
         currentStep={currentStep}

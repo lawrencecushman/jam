@@ -4,22 +4,18 @@ interface TransportProps {
   isPlaying: boolean;
   bpm: number;
   currentStep: number;
-  syncEnabled: boolean;
   onPlay: () => void;
   onStop: () => void;
   onBpmChange: (bpm: number) => void;
-  onToggleSync: () => void;
 }
 
 export function Transport({
   isPlaying,
   bpm,
   currentStep,
-  syncEnabled,
   onPlay,
   onStop,
   onBpmChange,
-  onToggleSync,
 }: TransportProps) {
   return (
     <div className="flex items-center gap-4 flex-wrap">
@@ -50,8 +46,8 @@ export function Transport({
         />
       </div>
 
-      {/* Step indicator dots */}
-      <div className="flex gap-1">
+      {/* Step indicator dots — hidden on mobile, too wide */}
+      <div className="hidden sm:flex gap-1">
         {Array.from({ length: STEP_COUNT }, (_, i) => (
           <div
             key={i}
@@ -62,24 +58,6 @@ export function Transport({
           />
         ))}
       </div>
-
-      <button
-        onClick={onToggleSync}
-        aria-pressed={syncEnabled}
-        title={
-          syncEnabled
-            ? "Sync on — your play/stop is shared with the room"
-            : "Sync off — your transport is independent"
-        }
-        className={[
-          "px-3 py-1 rounded text-xs font-mono border transition-colors",
-          syncEnabled
-            ? "border-blue-600 text-blue-400 bg-blue-950"
-            : "border-zinc-700 text-zinc-500 hover:text-zinc-300 hover:border-zinc-500",
-        ].join(" ")}
-      >
-        {syncEnabled ? "⟳ Sync On" : "⟳ Sync Off"}
-      </button>
     </div>
   );
 }
