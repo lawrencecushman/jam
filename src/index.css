@@ -16,22 +16,17 @@ textarea {
   user-select: text;
 }
 
-@keyframes step-pulse {
-  0%,
+@keyframes step-enable {
+  0% {
+    transform: scale(1.15);
+    box-shadow: 0 0 12px 4px rgb(52 211 153 / 0.5);
+  }
   100% {
     transform: scale(1);
-    box-shadow:
-      0 0 6px 1px rgb(52 211 153 / 0.3),
-      0 4px 6px -1px rgb(52 211 153 / 0.2);
-  }
-  50% {
-    transform: scale(1.08);
-    box-shadow:
-      0 0 14px 4px rgb(52 211 153 / 0.55),
-      0 4px 10px -1px rgb(52 211 153 / 0.35);
+    box-shadow: 0 0 0 0 rgb(52 211 153 / 0);
   }
 }
 
 .step-active {
-  animation: step-pulse 1.8s ease-in-out infinite;
+  animation: step-enable 0.35s ease-out forwards;
 }
