@@ -1,8 +1,7 @@
 import { nanoid } from "nanoid";
 import { Sequencer } from "./components/Sequencer/Sequencer";
 import { RoomProvider } from "./collaboration/RoomProvider";
-import { ShareButton } from "./components/Sequencer/ShareButton";
-import { NewRoomButton } from "./components/NewRoomButton";
+import { BottomBar } from "./components/BottomBar";
 
 function getRoomId(): string | null {
   return new URLSearchParams(window.location.search).get("room");
@@ -62,14 +61,11 @@ export default function App() {
 
   return (
     <RoomProvider>
-      <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center justify-center p-8 gap-6">
-        <div className="flex items-center gap-4">
-          <h1 className="text-2xl font-bold font-mono tracking-tight text-zinc-100">Jam Board</h1>
-          <ShareButton />
-          <NewRoomButton />
-        </div>
+      <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center justify-center p-8 pb-24 gap-6">
+        <h1 className="text-2xl font-bold font-mono tracking-tight text-zinc-100">Jam Board</h1>
         <Sequencer />
       </div>
+      <BottomBar />
     </RoomProvider>
   );
 }
