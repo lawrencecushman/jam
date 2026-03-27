@@ -8,7 +8,7 @@ import { STEP_COUNT } from "../config";
 // In development these default to localhost / public server.
 // Set VITE_WS_URL and VITE_SIGNALING_URL in your environment for production.
 const WS_URL = import.meta.env.VITE_WS_URL ?? "ws://localhost:1234";
-const SIGNALING_URL = import.meta.env.VITE_SIGNALING_URL ?? "wss://signaling.yjs.dev";
+const SIGNALING_URL = import.meta.env.VITE_SIGNALING_URL ?? `${WS_URL}/signaling`;
 
 interface RoomContextValue {
   doc: Y.Doc;
