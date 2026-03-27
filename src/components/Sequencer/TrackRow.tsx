@@ -28,6 +28,7 @@ export function TrackRow({
             key={i}
             active={active}
             isCurrent={currentStep === i}
+            isBeat={i % 4 === 0}
             presenceColor={presenceColors?.[i] ?? null}
             onPointerDown={() => onPointerDown(i)}
             onPointerEnter={() => onPointerEnter(i)}
