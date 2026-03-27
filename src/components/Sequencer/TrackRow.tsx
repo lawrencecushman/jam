@@ -1,6 +1,7 @@
 import { StepButton } from "./StepButton";
 
 interface TrackRowProps {
+  trackId: string;
   label: string;
   steps: boolean[];
   currentStep: number;
@@ -10,6 +11,7 @@ interface TrackRowProps {
 }
 
 export function TrackRow({
+  trackId,
   label,
   steps,
   currentStep,
@@ -26,6 +28,8 @@ export function TrackRow({
         {steps.map((active, i) => (
           <StepButton
             key={i}
+            trackId={trackId}
+            stepIndex={i}
             active={active}
             isCurrent={currentStep === i}
             isBeat={i % 4 === 0}

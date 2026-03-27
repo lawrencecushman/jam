@@ -37,11 +37,27 @@ export function Grid({ grid, currentStep, presenceFlashes, onPaint }: GridProps)
     onPaint(trackId, stepIndex, dragRef.current.paintMode);
   }
 
+  // On touch/mobile the pointer is captured by the first element touched,
+  // so pointerenter never fires on other steps during a drag. Use pointermove
+  // on the container + elementFromPoint to find the step under the finger.
+  function handlePointerMove(e: React.PointerEvent) {
+    if (!dragRef.current) return;
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    if (!el) return;
+    const btn = el.closest("[data-track][data-step]") as HTMLElement | null;
+    if (!btn) return;
+    const trackId = btn.dataset.track as TrackId;
+    const stepIndex = parseInt(btn.dataset.step ?? "", 10);
+    if (!trackId || isNaN(stepIndex)) return;
+    onPaint(trackId, stepIndex, dragRef.current.paintMode);
+  }
+
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2" onPointerMove={handlePointerMove}>
       {TRACKS.map(({ id, label }) => (
         <TrackRow
           key={id}
+          trackId={id}
           label={label}
           steps={grid[id].slice(0, STEP_COUNT)}
           currentStep={currentStep}
