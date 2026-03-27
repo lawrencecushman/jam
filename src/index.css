@@ -1,1 +1,12 @@
 @import "tailwindcss";
+
+/* Prevent text selection on drag/double-click across the whole UI */
+* {
+  user-select: none;
+}
+
+/* Re-enable selection only where users need to copy/paste */
+input,
+textarea {
+  user-select: text;
+}
