@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { TrackRow } from "./TrackRow";
 import { TRACKS, TrackId } from "../../audio/instruments";
+import { STEP_COUNT } from "../../config";
 
 interface GridProps {
   grid: Record<TrackId, boolean[]>;
@@ -42,7 +43,7 @@ export function Grid({ grid, currentStep, presenceFlashes, onPaint }: GridProps)
         <TrackRow
           key={id}
           label={label}
-          steps={grid[id]}
+          steps={grid[id].slice(0, STEP_COUNT)}
           currentStep={currentStep}
           presenceColors={presenceFlashes?.[id]}
           onPointerDown={(stepIndex) => handlePointerDown(id, stepIndex)}

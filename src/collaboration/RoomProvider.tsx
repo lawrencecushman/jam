@@ -38,6 +38,12 @@ function initializeGrid(doc: Y.Doc, grid: Y.Map<Y.Array<boolean>>) {
         const steps = new Y.Array<boolean>();
         steps.insert(0, Array(STEP_COUNT).fill(false));
         grid.set(id, steps);
+      } else {
+        // Trim any extra steps caused by concurrent initialization races
+        const steps = grid.get(id)!;
+        if (steps.length > STEP_COUNT) {
+          steps.delete(STEP_COUNT, steps.length - STEP_COUNT);
+        }
       }
     }
   });
