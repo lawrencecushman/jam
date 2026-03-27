@@ -22,7 +22,9 @@ export function StepButton({
   onPointerEnter,
 }: StepButtonProps) {
   const [justDisabled, setJustDisabled] = useState(false);
+  const [justHit, setJustHit] = useState(false);
   const prevActive = useRef(active);
+  const prevIsCurrent = useRef(isCurrent);
 
   useEffect(() => {
     if (prevActive.current && !active) {
@@ -33,6 +35,16 @@ export function StepButton({
     }
     prevActive.current = active;
   }, [active]);
+
+  useEffect(() => {
+    if (isCurrent && !prevIsCurrent.current && active) {
+      setJustHit(true);
+      const t = setTimeout(() => setJustHit(false), 250);
+      prevIsCurrent.current = isCurrent;
+      return () => clearTimeout(t);
+    }
+    prevIsCurrent.current = isCurrent;
+  }, [isCurrent, active]);
 
   return (
     <button
@@ -53,7 +65,7 @@ export function StepButton({
       className={[
         "w-8 h-8 rounded-sm border transition-colors duration-75 cursor-pointer select-none",
         active
-          ? "step-active bg-emerald-400 border-emerald-300"
+          ? `${justHit ? "step-hit" : "step-active"} bg-emerald-400 border-emerald-300`
           : justDisabled
             ? "step-disabled bg-zinc-800 border-zinc-700"
             : isBeat
