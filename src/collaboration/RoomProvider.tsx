@@ -1,9 +1,10 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import * as Y from "yjs";
 import { WebrtcProvider } from "y-webrtc";
 import { WebsocketProvider } from "y-websocket";
 import { TRACKS } from "../audio/instruments";
 import { STEP_COUNT } from "../config";
+import { useIdleDetector } from "./useIdleDetector";
 
 // In development these default to localhost / public server.
 // Set VITE_WS_URL and VITE_SIGNALING_URL in your environment for production.
@@ -15,6 +16,7 @@ interface RoomContextValue {
   provider: WebrtcProvider | null;
   grid: Y.Map<Y.Array<boolean>>;
   roomId: string;
+  connected: boolean;
 }
 
 const RoomContext = createContext<RoomContextValue | null>(null);
@@ -52,19 +54,27 @@ function initializeGrid(doc: Y.Doc, grid: Y.Map<Y.Array<boolean>>) {
 export function RoomProvider({ children }: { children: React.ReactNode }) {
   const roomId = useMemo(() => getOrCreateRoomId(), []);
   const [provider, setProvider] = useState<WebrtcProvider | null>(null);
+  const [connected, setConnected] = useState(true);
 
   const doc = useMemo(() => new Y.Doc(), []);
   const grid = useMemo(() => doc.getMap<Y.Array<boolean>>("grid"), [doc]);
 
+  // Idle detector: disconnect after 5 min of inactivity, reconnect on any activity.
+  useIdleDetector(
+    useCallback(() => setConnected(false), []),
+    useCallback(() => setConnected(true), []),
+  );
+
   useEffect(() => {
+    // When idle-disconnected, leave providers destroyed.
+    if (!connected) return;
+
     // Skip WebSocket if page is HTTPS but WS_URL is plain ws:// — the browser will
     // block the connection as mixed content (e.g. app loaded via ngrok over https
     // but the local persistence server is on ws://localhost:1234).
     const wsAvailable = !(window.location.protocol === "https:" && WS_URL.startsWith("ws://"));
 
     // WebSocket provider: connects to the persistence server.
-    // Its 'sync' event fires once the server has delivered any saved doc state.
-    // If the server is unreachable or skipped, the fallback timer handles initialization.
     const wsProvider = wsAvailable ? new WebsocketProvider(WS_URL, roomId, doc) : null;
 
     // WebRTC provider: low-latency P2P sync between browser tabs + awareness (presence).
@@ -74,8 +84,6 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
 
     // Initialize grid tracks once the server has delivered any persisted state.
     // initializeGrid is idempotent — it only adds tracks that don't exist yet.
-    // Fallback: if WS doesn't sync within 3s (server down or first-ever visit),
-    // initialize anyway so the UI is never stuck waiting.
     let done = false;
     const ensureInit = () => {
       if (done) return;
@@ -83,14 +91,11 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
       initializeGrid(doc, grid);
     };
 
-    // WebSocket sync: fires when the server delivers persisted state
     wsProvider?.on("sync", (synced: boolean) => {
       if (synced) ensureInit();
     });
     if (wsProvider?.synced) ensureInit();
 
-    // WebRTC sync: fires when a peer delivers state (works without the WS server,
-    // e.g. remote users accessing via ngrok who can't reach ws://localhost:1234)
     webrtcProvider.on("synced", ({ synced }: { synced: boolean }) => {
       if (synced) ensureInit();
     });
@@ -98,7 +103,6 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
     // Last-resort fallback: if neither provider syncs within 3s, initialize anyway
     const fallback = setTimeout(ensureInit, 3000);
 
-    // Expose the WebRTC provider via context — usePresence uses its .awareness
     setProvider(webrtcProvider);
 
     return () => {
@@ -107,9 +111,11 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
       webrtcProvider.destroy();
       setProvider(null);
     };
-  }, [roomId, doc, grid]);
+  }, [roomId, doc, grid, connected]);
 
   return (
-    <RoomContext.Provider value={{ doc, provider, grid, roomId }}>{children}</RoomContext.Provider>
+    <RoomContext.Provider value={{ doc, provider, grid, roomId, connected }}>
+      {children}
+    </RoomContext.Provider>
   );
 }
