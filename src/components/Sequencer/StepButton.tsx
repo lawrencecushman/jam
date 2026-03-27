@@ -36,9 +36,9 @@ export function StepButton({
         ...(presenceColor ? { boxShadow: `0 0 0 2px ${presenceColor}` } : {}),
       }}
       className={[
-        "w-8 h-8 rounded-sm border transition-all duration-75 cursor-pointer select-none",
+        "w-8 h-8 rounded-sm border transition-colors duration-75 cursor-pointer select-none",
         active
-          ? "bg-emerald-400 border-emerald-300 shadow-lg shadow-emerald-400/30"
+          ? "step-active bg-emerald-400 border-emerald-300"
           : isBeat
             ? "bg-zinc-800 border-zinc-600 hover:bg-zinc-700"
             : "bg-zinc-800 border-zinc-700 hover:bg-zinc-700",
