@@ -5,9 +5,10 @@ import { WebsocketProvider } from "y-websocket";
 import { TRACKS } from "../audio/instruments";
 import { STEP_COUNT } from "../config";
 
-// In development this defaults to localhost. For production, set VITE_WS_URL
-// in your environment (e.g. VITE_WS_URL=wss://your-server.com npm run build).
+// In development these default to localhost / public server.
+// Set VITE_WS_URL and VITE_SIGNALING_URL in your environment for production.
 const WS_URL = import.meta.env.VITE_WS_URL ?? "ws://localhost:1234";
+const SIGNALING_URL = import.meta.env.VITE_SIGNALING_URL ?? "wss://signaling.yjs.dev";
 
 interface RoomContextValue {
   doc: Y.Doc;
@@ -62,7 +63,7 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
 
     // WebRTC provider: low-latency P2P sync between browser tabs + awareness (presence).
     const webrtcProvider = new WebrtcProvider(roomId, doc, {
-      signaling: ["wss://5496-97-126-173-226.ngrok-free.app", "wss://signaling.yjs.dev"],
+      signaling: [SIGNALING_URL],
     });
 
     // Initialize grid tracks once the server has delivered any persisted state.
