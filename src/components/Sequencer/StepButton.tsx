@@ -21,10 +21,9 @@ const DISABLE_KEYFRAMES: Keyframe[] = [
   { transform: "scale(1)", opacity: "1" },
 ];
 
-const HIT_KEYFRAMES: Keyframe[] = [
-  { transform: "scale(1.2)", boxShadow: "0 0 18px 6px rgb(52 211 153 / 0.75)" },
-  { transform: "scale(1)", boxShadow: "0 0 0 0 rgb(52 211 153 / 0)" },
-];
+// No boxShadow in hit keyframes — the ring indicator is also box-shadow-based
+// and would be overridden during the animation.
+const HIT_KEYFRAMES: Keyframe[] = [{ transform: "scale(1.2)" }, { transform: "scale(1)" }];
 
 function play(el: HTMLElement, keyframes: Keyframe[], duration: number) {
   el.getAnimations().forEach((a) => a.cancel());
